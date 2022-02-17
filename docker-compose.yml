@@ -1,0 +1,33 @@
+version: "3.8" #Version del esquema .yml
+services: #Definir la lista de servicios que se quieran ejecutar
+  nodered: #Primer servicio Nodered
+      container_name: Nodered #Colocar nombre al contenedor de node-red
+      image: nodered/node-red:latest #Cargar la imagen de node-red
+      restart: always #Se coloca para reiniciar automáticamente por si se encuentra alguna falla
+      ports: #Definir el valor del puerto de Node-red
+      - 1880:1880 #Puerto de node-red
+      depends_on: # Permite que el inicio de ejecución de un servicio dependa de otros.
+      - influxdb #Node-red depende de influxDB
+  #Comienza Influxdb
+  influxdb: #Fuente de datos para node-red y grafana 
+      container_name: InfluxDB #Definir el nombre del contenedor de influxDB
+      image: influxdb #Cargar la imagen de influxDB
+      restart: always #Se coloca para reiniciar automáticamente por si se encuentra alguna falla
+      environment: # Permitira establecer una lista de variables de entorno que estarás disponibles en el servicio
+        - INFLUXDB_DB=grafana #Creara una base de datos cuando creemos el contenedor
+        - INFLUXDB_USER=grafana #Creara un usuario para la base de datos (grafana)
+        - INFLUXDB_USER_PASSWORD=password # Creación de una contraseña para la base de datos
+        - INFLUXDB_ADMIN_ENABLE=true #Habilita una cuenta de administrador para influx
+        - INFLUXDB_ADMIN_USER=admin #Se crea un usuario
+        - INFLUXDB_ADMIN_PASSWORD=admin #Se crea una contraseña
+#Empieza Grafana
+  grafana: # Creación del segundo servicio grafana
+      container_name: Grafana #Definir el nombre del contenedor de grafana
+      image: grafana/grafana #Cargar la imagen de grafana
+      restart: always #Se coloca para reiniciar automáticamente por si se encuentra alguna falla
+      ports: #Definir el valor del puerto de grafana
+      - 3000:3000 #Puerto de grafana
+      depends_on: # Permite que el inicio de ejecución de un servicio dependa de otros.
+      - influxdb #Grafama depende de influxDB
+      
+  
